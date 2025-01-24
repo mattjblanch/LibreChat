@@ -61,12 +61,13 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
         with:
-          file: Dockerfile.multi
+          context: .
+          file: ${{ matrix.file }}
           platforms: linux/amd64,linux/arm64
-          target: api-build
+          target: ${{ matrix.target }}
           tags: |
-            ghcr.io/mattjblanch/librechat-api:${{ github.sha }}
-            ghcr.io/mattjblanch/librechat-api:latest
-            mattjblanch/librechat-api:${{ github.sha }}
-            mattjblanch/librechat-api:latest
+            ghcr.io/mattjblanch/${{ matrix.image_name }}:${{ github.sha }}
+            ghcr.io/mattjblanch/${{ matrix.image_name }}:latest
+            mattjblanch/${{ matrix.image_name }}:${{ github.sha }}
+            mattjblanch/${{ matrix.image_name }}:latest
           push: true
