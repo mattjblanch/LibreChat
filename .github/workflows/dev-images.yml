@@ -31,8 +31,14 @@ jobs:
 
       # Debug step to print github.repository_owner
       - name: Print github.repository_owner
+        id: print-owner
         run: |
-          echo "Repository Owner: ${{ github.repository_owner }}"
+          echo "::set-output name=owner::${{ github.repository_owner }}"
+
+      # Display the output
+      - name: Display repository owner
+        run: |
+          echo "Repository Owner: ${{ steps.print-owner.outputs.owner }}"
 
       # Set up QEMU
       - name: Set up QEMU
