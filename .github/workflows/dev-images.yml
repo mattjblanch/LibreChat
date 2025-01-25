@@ -29,6 +29,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Debug step to print github.repository_owner
+      - name: Print github.repository_owner
+        run: |
+          echo "Repository Owner: ${{ github.repository_owner }}"
+
       # Set up QEMU
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
