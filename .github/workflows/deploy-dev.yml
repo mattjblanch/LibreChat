@@ -46,6 +46,7 @@ jobs:
           DO_USER: ${{ secrets.DO_USER }}
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${DO_USER}@${DO_HOST} << EOF
+          sudo apt update && sudo apt install -y npm
           sudo -i -u matt bash << EEOF
           cd ~/LibreChat && \
           git fetch origin main && \
