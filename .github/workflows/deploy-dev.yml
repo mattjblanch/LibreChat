@@ -24,6 +24,14 @@ jobs:
         key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
         known_hosts: ${{ secrets.DO_KNOWN_HOSTS }}
 
+    - name: Remove old host key
+      run: |
+        ssh-keygen -f "/home/runner/.ssh/known_hosts" -R "${{ secrets.DO_HOST }}"
+
+    - name: Add new host key
+      run: |
+        ssh-keyscan -H ${{ secrets.DO_HOST }} >> /home/runner/.ssh/known_hosts
+
     - name: Verify SSH Key and Connection
       env:
         DO_HOST: ${{ secrets.DO_HOST }}
