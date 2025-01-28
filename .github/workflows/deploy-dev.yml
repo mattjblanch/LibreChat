@@ -40,6 +40,11 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${DO_USER}@${DO_HOST} "echo 'SSH connection established'"
 
+    - name: Debug SSH Key
+      run: |
+        echo "${{ secrets.DO_SSH_PRIVATE_KEY }}" | ssh-keygen -lf -
+        ssh-keyscan -H ${{ secrets.DO_HOST }} > /dev/null
+
     - name: Run update script on DigitalOcean Droplet
       env:
         DO_HOST: ${{ secrets.DO_HOST }}
