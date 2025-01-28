@@ -20,8 +20,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
 
       - name: Ensure known_hosts file exists
-        run: |
-          touch ~/.ssh/known_hosts
+        run: touch ~/.ssh/known_hosts
 
       - name: Remove old host key
         run: ssh-keygen -f "/home/runner/.ssh/known_hosts" -R "${{ secrets.DO_HOST }}"
@@ -38,7 +37,7 @@ jobs:
 
       - name: Debug SSH Key
         run: |
-          echo "${{ secrets.DO_SSH_PRIVATE_KEY }}" | ssh-keygen -lf -
+          ssh-keygen -lf ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.DO_HOST }} > /dev/null
 
       - name: Run update script on DigitalOcean Droplet
