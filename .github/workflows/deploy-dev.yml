@@ -38,7 +38,7 @@ jobs:
         DO_USER: ${{ secrets.DO_USER }}
       run: |
         chmod 600 ~/.ssh/id_rsa
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${DO_USER}@${DO_HOST} "echo 'SSH connection established'"
+        ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${DO_USER}@${DO_HOST} "echo 'SSH connection established'"
 
     - name: Run update script on DigitalOcean Droplet
       env:
