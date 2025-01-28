@@ -24,7 +24,10 @@ jobs:
         key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
         known_hosts: ${{ secrets.DO_KNOWN_HOSTS }}
 
-    - name: Verify SSH Key
+    - name: Verify SSH Key and Connection
+      env:
+        DO_HOST: ${{ secrets.DO_HOST }}
+        DO_USER: ${{ secrets.DO_USER }}
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${DO_USER}@${DO_HOST} "echo 'SSH connection established'"
 
@@ -33,7 +36,7 @@ jobs:
         DO_HOST: ${{ secrets.DO_HOST }}
         DO_USER: ${{ secrets.DO_USER }}
       run: |
-        ssh -o StrictHostKeyChecking=no ${DO_USER}@${DO_HOST} << EOF
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${DO_USER}@${DO_HOST} << EOF
         sudo -i -u matt bash << EEOF
         cd ~/LibreChat && \
         git fetch origin main && \
