@@ -13,6 +13,7 @@ jobs:
     if: |
       github.repository == 'mattjblanch/LibreChat' &&
       (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -22,6 +23,10 @@ jobs:
       with:
         key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
         known_hosts: ${{ secrets.DO_KNOWN_HOSTS }}
+
+    - name: Verify SSH Key
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${DO_USER}@${DO_HOST} "echo 'SSH connection established'"
 
     - name: Run update script on DigitalOcean Droplet
       env:
