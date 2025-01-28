@@ -27,7 +27,7 @@ jobs:
     - name: Remove old host key
       run: |
         ssh-keygen -f "/home/runner/.ssh/known_hosts" -R "${{ secrets.DO_HOST }}"
-
+        echo "$PRIVATE_KEY" | ssh-keygen -lf -
     - name: Add new host key
       run: |
         ssh-keyscan -H ${{ secrets.DO_HOST }} >> /home/runner/.ssh/known_hosts
