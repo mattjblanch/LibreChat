@@ -17,11 +17,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # - name: Install SSH Key
-    #   uses: shimataro/ssh-key-action@v2
-    #   with:
-    #     key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
-    #     known_hosts: ${{ secrets.DO_KNOWN_HOSTS }}
+    - name: Install SSH Key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
+        known_hosts: ${{ secrets.DO_KNOWN_HOSTS }}
 
     - name: Run update script on DigitalOcean Droplet
       env:
@@ -29,7 +29,7 @@ jobs:
         DO_USER: ${{ secrets.DO_USER }}
       run: |
         ssh -o StrictHostKeyChecking=no ${DO_USER}@${DO_HOST} << EOF
-        sudo -i -u danny bash << EEOF
+        sudo -i -u matt bash << EEOF
         cd ~/LibreChat && \
         git fetch origin main && \
         npm run update:deployed && \
