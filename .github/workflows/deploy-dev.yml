@@ -1,63 +1,54 @@
-name: Update Test Server
+name: Deploy to Development
 
 on:
-  workflow_run:
-    workflows: ["Docker Dev Images Build"]
-    types:
-      - completed
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: |
-      github.repository == 'mattjblanch/LibreChat' &&
-      (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Install SSH Key
-      uses: shimataro/ssh-key-action@v2
-      with:
-        key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
-        known_hosts: ${{ secrets.DO_KNOWN_HOSTS }}
+      - name: Set up SSH key
+        run: |
+          echo "${{ secrets.DO_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
 
-    - name: Remove old host key
-      run: |
-        ssh-keygen -f "/home/runner/.ssh/known_hosts" -R "${{ secrets.DO_HOST }}"
-        echo "$PRIVATE_KEY" | ssh-keygen -lf -
-    - name: Add new host key
-      run: |
-        ssh-keyscan -H ${{ secrets.DO_HOST }} >> /home/runner/.ssh/known_hosts
+      - name: Remove old host key
+        run: ssh-keygen -f "/home/runner/.ssh/known_hosts" -R "${{ secrets.DO_HOST }}"
 
-    - name: Verify SSH Key and Connection
-      env:
-        DO_HOST: ${{ secrets.DO_HOST }}
-        DO_USER: ${{ secrets.DO_USER }}
-      run: |
-        chmod 600 ~/.ssh/id_rsa
-        ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${DO_USER}@${DO_HOST} "echo 'SSH connection established'"
+      - name: Add new host key
+        run: ssh-keyscan -H ${{ secrets.DO_HOST }} >> /home/runner/.ssh/known_hosts
 
-    - name: Debug SSH Key
-      run: |
-        echo "${{ secrets.DO_SSH_PRIVATE_KEY }}" | ssh-keygen -lf -
-        ssh-keyscan -H ${{ secrets.DO_HOST }} > /dev/null
+      - name: Verify SSH Key and Connection
+        env:
+          DO_HOST: ${{ secrets.DO_HOST }}
+          DO_USER: ${{ secrets.DO_USER }}
+        run: |
+          ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${DO_USER}@${DO_HOST} "echo 'SSH connection established'"
 
-    - name: Run update script on DigitalOcean Droplet
-      env:
-        DO_HOST: ${{ secrets.DO_HOST }}
-        DO_USER: ${{ secrets.DO_USER }}
-      run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${DO_USER}@${DO_HOST} << EOF
-        sudo -i -u matt bash << EEOF
-        cd ~/LibreChat && \
-        git fetch origin main && \
-        npm run update:deployed && \
-        git checkout do-deploy && \
-        git rebase main && \
-        npm run start:deployed && \
-        echo "Update completed. Application should be running now."
-        EEOF
-        EOF
+      - name: Debug SSH Key
+        run: |
+          echo "${{ secrets.DO_SSH_PRIVATE_KEY }}" | ssh-keygen -lf -
+          ssh-keyscan -H ${{ secrets.DO_HOST }} > /dev/null
+
+      - name: Run update script on DigitalOcean Droplet
+        env:
+          DO_HOST: ${{ secrets.DO_HOST }}
+          DO_USER: ${{ secrets.DO_USER }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${DO_USER}@${DO_HOST} << EOF
+          sudo -i -u matt bash << EEOF
+          cd ~/LibreChat && \
+          git fetch origin main && \
+          npm run update:deployed && \
+          git checkout do-deploy && \
+          git rebase main && \
+          npm run start:deployed && \
+          echo "Update completed. Application should be running now."
+          EEOF
+          EOF
